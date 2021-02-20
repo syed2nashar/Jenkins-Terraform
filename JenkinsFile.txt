@@ -1,0 +1,34 @@
+pipeline{
+    agent any
+    environment{
+        AWS_ACS_KEY = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SEC_KEY = credentials('AWS_SECRET_KEY')
+    }
+    tools {
+           terraform 'terraform'
+          }
+    stages{
+        stage('Git Checkout')
+        {
+            steps
+            {
+                git 'https://github.com/VigneshHendrix/AWS_Infra_Automation-TERRAFORM'
+            }
+        }
+        stage('Terraform Init')
+        {
+            steps
+            {
+                sh 'terraform init'
+            }
+        }
+         stage('Terraform Apply')
+        {
+            steps
+            {
+                sh 'terraform apply --auto-approve -var "ACSKEY=$AWS_ACS_KEY" -var "SKEY=$AWS_SEC_KEY" -var "ASGname=APWPASG" -var "vpcCIDR=10.0.0.0/16" -var "Instance_Type_APWP=t2.micro" -var "Instance_Type_DB=t2.micro" -var "CIDR_Pub_Subnet=10.0.1.0/24" -var "CIDR_Pr_Subnet=10.0.2.0/24"'
+            }
+        }
+    }      
+
+}
