@@ -12,7 +12,7 @@ pipeline{
         {
             steps
             {
-                git 'https://github.com/VigneshHendrix/AWS_Infra_Automation-TERRAFORM'
+                git 'https://github.com/VigneshHendrix/AWS_Infra---Terraform'
             }
         }
         stage('Terraform Init')
