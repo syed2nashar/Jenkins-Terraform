@@ -255,19 +255,50 @@ resource "aws_autoscaling_group" "AutoScalingGroup" {
   target_group_arns         = [aws_lb_target_group.TargetGroup.arn]
 }
 
-resource "aws_autoscaling_policy" "ScalingPolicy" {
+resource "aws_autoscaling_policy" "ScaleUPPolicy" {
   name                   = "ScalingPolicyfrAPWPASG"
   adjustment_type        = "ChangeInCapacity"
   autoscaling_group_name = aws_autoscaling_group.AutoScalingGroup.name
-  policy_type            = "TargetTrackingScaling"
-  target_tracking_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ASGAverageCPUUtilization"
-    }
-
-    target_value = 70.0
-  }
+  scaling_adjustment     = 1
+  cooldown               = 60
 }
+
+resource "aws_autoscaling_policy" "ScaleDownPolicy" {
+  name                   = "ScalingPolicyfrAPWPASG"
+  adjustment_type        = "ChangeInCapacity"
+  autoscaling_group_name = aws_autoscaling_group.AutoScalingGroup.name
+  scaling_adjustment     = -1
+  cooldown               = 60
+}
+
+resource "aws_cloudwatch_metric_alarm" "CPUAlarmLow" {
+  alarm_name          = "CPUAlarmLowforAPWPASG"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "70"
+  alarm_description   = "Drop/Terminate an EC2 Instance(APWP) if CPU Utilization < 70"
+  actions_enabled     = "true"
+  alarm_actions       = [aws_autoscaling_policy.ScaleDownPolicy.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "CPUAlarmHigh" {
+  alarm_name          = "CPUAlarmHighforAPWPASG"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "70"
+  alarm_description   = "Spin up an EC2 Instance(APWP) if CPU Utilization > 70"
+  actions_enabled     = "true"
+  alarm_actions       = [aws_autoscaling_policy.ScaleUPPolicy.arn]
+}
+
 
 resource "aws_lb" "LoadBalancer" {
   name               = "LbforAPWPASG"
