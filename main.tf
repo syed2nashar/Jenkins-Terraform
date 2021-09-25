@@ -161,7 +161,7 @@ resource "aws_security_group" "SecurityGroupFrPrInstance" {
 }
 
 resource "aws_instance" "InstanceforAPWP" {
-  ami             = "ami-0a91cd140a1fc148a"
+  ami             = "ami-087c17d1fe0178315"
   instance_type   = var.Instance_Type_APWP
   subnet_id       = aws_subnet.Public_Subnet.id
   key_name        = "First_Instance"
@@ -188,7 +188,7 @@ resource "aws_instance" "InstanceforAPWP" {
   }
 }
 resource "aws_instance" "InstanceforMySQL" {
-  ami             = "ami-0a91cd140a1fc148a"
+  ami             = "ami-087c17d1fe0178315"
   instance_type   = var.Instance_Type_DB
   subnet_id       = aws_subnet.Private_Subnet.id
   key_name        = "First_Instance"
@@ -224,7 +224,7 @@ resource "aws_subnet" "Public_Subnet2" {
 
 resource "aws_launch_configuration" "LaunchConfiguration" {
   name                        = "APWPLC"
-  image_id                    = "ami-03946fd338928596f"
+  image_id                    = "ami-0675f7dc665743584"
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   key_name                    = "First_Instance"
