@@ -11,7 +11,7 @@ resource "aws_subnet" "Public_Subnet" {
   cidr_block              = var.CIDR_Pub_Subnet
   vpc_id                  = aws_vpc.VPC.id
   map_public_ip_on_launch = true
-  availability_zone       = "us-east-1a"
+  availability_zone       = "us-east-2a"
   tags = {
     Name = "Public Subnet"
   }
@@ -161,7 +161,7 @@ resource "aws_security_group" "SecurityGroupFrPrInstance" {
 }
 
 resource "aws_instance" "InstanceforAPWP" {
-  ami             = "ami-09e67e426f25ce0d7"
+  ami             = "ami-0a91cd140a1fc148a"
   instance_type   = var.Instance_Type_APWP
   subnet_id       = aws_subnet.Public_Subnet.id
   key_name        = "First_Instance"
@@ -188,7 +188,7 @@ resource "aws_instance" "InstanceforAPWP" {
   }
 }
 resource "aws_instance" "InstanceforMySQL" {
-  ami             = "ami-09e67e426f25ce0d7"
+  ami             = "ami-0a91cd140a1fc148a"
   instance_type   = var.Instance_Type_DB
   subnet_id       = aws_subnet.Private_Subnet.id
   key_name        = "First_Instance"
@@ -216,7 +216,7 @@ resource "aws_instance" "InstanceforMySQL" {
 resource "aws_subnet" "Public_Subnet2" {
   cidr_block        = "10.0.3.0/24"
   vpc_id            = aws_vpc.VPC.id
-  availability_zone = "us-east-1a"
+  availability_zone = "us-east-2b"
   tags = {
     Name = "Extra Public Subnet for LB"
   }
@@ -224,7 +224,7 @@ resource "aws_subnet" "Public_Subnet2" {
 
 resource "aws_launch_configuration" "LaunchConfiguration" {
   name                        = "APWPLC"
-  image_id                    = "ami-0675f7dc665743584"
+  image_id                    = "ami-03946fd338928596f"
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   key_name                    = "First_Instance"
@@ -252,7 +252,7 @@ resource "aws_autoscaling_group" "AutoScalingGroup" {
   desired_capacity          = 1
   launch_configuration      = aws_launch_configuration.LaunchConfiguration.name
   vpc_zone_identifier       = [aws_subnet.Public_Subnet.id, aws_subnet.Public_Subnet2.id]
-  target_group_arns         = [aws.TargetGroup.arn]
+  target_group_arns         = [aws_lb_target_group.TargetGroup.arn]
 }
 
 resource "aws_autoscaling_policy" "ScaleUPPolicy" {
@@ -311,17 +311,15 @@ resource "aws_lb" "LoadBalancer" {
 }
 
 resource "aws_lb_listener" "Listener" {
-  load_balancer_arn = aws.LoadBalancer.arn
+  load_balancer_arn = aws_lb.LoadBalancer.arn
   port              = 80
   protocol          = "HTTP"
   default_action {
     type             = "forward"
-    target_group_arn = aws.TargetGroup.arn
+    target_group_arn = aws_lb_target_group.TargetGroup.arn
   }
 }
 
 output "Load_Balancer_DNS" {
-  value = aws.LoadBalancer.dns_name
+  value = aws_lb.LoadBalancer.dns_name
 }
-
-
