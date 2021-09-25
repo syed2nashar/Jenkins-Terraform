@@ -252,7 +252,7 @@ resource "aws_autoscaling_group" "AutoScalingGroup" {
   desired_capacity          = 1
   launch_configuration      = aws_launch_configuration.LaunchConfiguration.name
   vpc_zone_identifier       = [aws_subnet.Public_Subnet.id, aws_subnet.Public_Subnet2.id]
-  target_group_arns         = [aws_lb_target_group.TargetGroup.arn]
+  target_group_arns         = [aws.TargetGroup.arn]
 }
 
 resource "aws_autoscaling_policy" "ScaleUPPolicy" {
@@ -311,17 +311,17 @@ resource "aws_lb" "LoadBalancer" {
 }
 
 resource "aws_lb_listener" "Listener" {
-  load_balancer_arn = aws_lb.LoadBalancer.arn
+  load_balancer_arn = aws.LoadBalancer.arn
   port              = 80
   protocol          = "HTTP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.TargetGroup.arn
+    target_group_arn = aws.TargetGroup.arn
   }
 }
 
 output "Load_Balancer_DNS" {
-  value = aws_lb.LoadBalancer.dns_name
+  value = aws.LoadBalancer.dns_name
 }
 
 
