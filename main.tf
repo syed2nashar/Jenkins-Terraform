@@ -224,7 +224,7 @@ resource "aws_subnet" "Public_Subnet2" {
 
 resource "aws_launch_configuration" "LaunchConfiguration" {
   name                        = "APWPLC"
-  image_id                    = "ami-070545b6827c412c4"
+  image_id                    = "ami-0a3dc9e3f83f1d06d"
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   key_name                    = "First_Instance"
